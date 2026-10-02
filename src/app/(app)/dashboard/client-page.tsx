@@ -10,10 +10,12 @@ import { MoneyWidget } from "@/components/dashboard/money-widget"
 import { addTask } from "@/app/actions"
 import { toast } from "sonner"
 import { useTransition } from "react"
+import { useAuth } from "@/lib/auth-context"
 
 export default function DashboardClientPage({ initialTasks }: { initialTasks: any[] }) {
   const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   const [isPending, startTransition] = useTransition()
+  const isLoggedIn = useAuth()
   
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
@@ -25,7 +27,7 @@ export default function DashboardClientPage({ initialTasks }: { initialTasks: an
       >
         <div>
           <p suppressHydrationWarning className="text-sm text-muted-foreground mb-1">{currentDate}</p>
-          <h1 className="text-3xl font-bold tracking-tight">Good morning, Alex.</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Good morning{isLoggedIn ? "." : ", Alex."}</h1>
           <p className="text-muted-foreground mt-1">Here's what matters today.</p>
         </div>
         <div className="hidden sm:block">
