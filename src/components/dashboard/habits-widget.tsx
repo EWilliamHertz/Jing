@@ -1,0 +1,31 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CheckCircle2 } from "lucide-react"
+
+export function HabitsWidget() {
+  return (
+    <Card className="bg-card text-card-foreground">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg">Habits</CardTitle>
+      </CardHeader>
+      <CardContent className="pt-2 space-y-4">
+        {[
+          { name: "Morning walk", done: true },
+          { name: "Read 20 minutes", done: true },
+          { name: "Drink water", done: false },
+          { name: "Meditation", done: false }
+        ].map((habit, i) => (
+          <div key={i} className="flex items-center justify-between group cursor-pointer">
+            <span className={`text-sm ${habit.done ? 'text-muted-foreground' : ''}`}>{habit.name}</span>
+            <button className="focus:outline-none">
+              {habit.done ? (
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+              ) : (
+                <div className="h-5 w-5 rounded-full border border-muted-foreground group-hover:border-primary transition-colors" />
+              )}
+            </button>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
