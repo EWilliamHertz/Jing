@@ -10,8 +10,9 @@ import {
   LayoutDashboard, CheckSquare, Target, CheckCircle2, 
   FolderGit2, Wallet, BookOpen, Map, Search, Lightbulb, 
   FileText, Calendar as CalendarIcon, Settings, Users,
-  ChevronDown, ChevronRight, BrainCircuit, Sparkles
+  ChevronDown, ChevronRight, BrainCircuit, Sparkles, LogOut
 } from "lucide-react"
+import { clearAuthCookie } from "@/app/actions"
 
 const navigationGroups = [
   {
@@ -139,11 +140,21 @@ export function Sidebar() {
         <div className="flex items-center justify-between pt-2 mt-2 border-t border-border/50">
           <Link
             href="/settings"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors flex-1"
+            className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           >
             <Settings className="h-4 w-4" />
             Settings
           </Link>
+          <button
+            onClick={async () => {
+              await clearAuthCookie()
+              window.location.href = '/'
+            }}
+            className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            Log out
+          </button>
           <div className="pr-2">
             <ThemeToggle />
           </div>

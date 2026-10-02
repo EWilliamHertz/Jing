@@ -3,8 +3,11 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CalendarIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
 
 export default function CalendarPage() {
+  const isLoggedIn = useAuth()
+
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8 h-full flex flex-col">
       <div className="flex justify-between items-end">
@@ -32,23 +35,28 @@ export default function CalendarPage() {
             ))}
           </div>
           <div className="grid grid-cols-7 flex-1">
-            {Array.from({ length: 35 }).map((_, i) => (
-              <div key={i} className={`min-h-[100px] border-b border-r border-border p-2 ${i % 7 === 6 ? 'border-r-0' : ''} ${i > 27 ? 'border-b-0' : ''}`}>
-                <span className={`text-sm font-medium ${i === 15 ? 'bg-primary text-primary-foreground h-6 w-6 rounded-full flex items-center justify-center' : 'text-muted-foreground'}`}>
-                  {(i % 31) + 1}
-                </span>
-                {i === 15 && (
-                  <div className="mt-2 px-2 py-1 bg-primary/20 text-primary text-xs rounded border border-primary/30 truncate">
-                    Dental Appt
-                  </div>
-                )}
-                {i === 18 && (
-                  <div className="mt-2 px-2 py-1 bg-blue-500/20 text-blue-500 text-xs rounded border border-blue-500/30 truncate">
-                    Team Sync
-                  </div>
-                )}
-              </div>
-            ))}
+            {Array.from({ length: 35 }).map((_, i) => {
+              const hasEvent1 = !isLoggedIn && i === 15;
+              const hasEvent2 = !isLoggedIn && i === 18;
+              
+              return (
+                <div key={i} className={`min-h-[100px] border-b border-r border-border p-2 ${i % 7 === 6 ? 'border-r-0' : ''} ${i > 27 ? 'border-b-0' : ''}`}>
+                  <span className={`text-sm font-medium ${hasEvent1 ? 'bg-primary text-primary-foreground h-6 w-6 rounded-full flex items-center justify-center' : 'text-muted-foreground'}`}>
+                    {(i % 31) + 1}
+                  </span>
+                  {hasEvent1 && (
+                    <div className="mt-2 px-2 py-1 bg-primary/20 text-primary text-xs rounded border border-primary/30 truncate">
+                      Dental Appt
+                    </div>
+                  )}
+                  {hasEvent2 && (
+                    <div className="mt-2 px-2 py-1 bg-blue-500/20 text-blue-500 text-xs rounded border border-blue-500/30 truncate">
+                      Team Sync
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>

@@ -4,8 +4,12 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { ArrowLeft, Mail, Lock, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { setAuthCookie } from "@/app/actions"
+import { useRouter } from "next/navigation"
 
 export default function RegisterPage() {
+  const router = useRouter()
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col selection:bg-white selection:text-black">
       {/* Top Nav */}
@@ -33,9 +37,10 @@ export default function RegisterPage() {
             <p className="text-white/50 text-sm">Get started with Jing today.</p>
           </div>
 
-          <form className="space-y-4 mt-8" onSubmit={(e) => {
+          <form className="space-y-4 mt-8" onSubmit={async (e) => {
             e.preventDefault();
-            window.location.href = '/dashboard';
+            await setAuthCookie();
+            router.push('/dashboard');
           }}>
             <div className="space-y-4">
               <div className="relative group">
