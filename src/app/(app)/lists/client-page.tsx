@@ -4,11 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, Circle, Search, Plus } from "lucide-react"
 import { useTransition } from "react"
+import { usePrompt } from "@/components/ui/prompt-dialog"
 import { addList, addListItem, toggleListItem } from "@/app/actions"
 import { toast } from "sonner"
 
 export default function ListsClientPage({ initialLists }: { initialLists: any[] }) {
   const lists = initialLists
+  const { ask } = usePrompt()
   const [isPending, startTransition] = useTransition()
 
   return (
@@ -18,8 +20,8 @@ export default function ListsClientPage({ initialLists }: { initialLists: any[] 
           <h1 className="text-3xl font-bold tracking-tight">Lists</h1>
           <p className="text-muted-foreground mt-1">Shopping, packing, errands and more.</p>
         </div>
-        <Button onClick={() => {
-          const title = prompt("List title:")
+        <Button onClick={async () => {
+          const title = await ask("List title:")
           if (title) {
             startTransition(() => {
               addList(title)
@@ -51,8 +53,8 @@ export default function ListsClientPage({ initialLists }: { initialLists: any[] 
                 </div>
               ))}
               <div className="pt-2">
-                <Button onClick={() => {
-                  const itemName = prompt("Item name:")
+                <Button onClick={async () => {
+                  const itemName = await ask("Item name:")
                   if (itemName) {
                     startTransition(() => {
                       addListItem(list.id, itemName)

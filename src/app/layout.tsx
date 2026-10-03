@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { Toaster } from "sonner";
 import { cookies } from "next/headers";
 import { AuthProvider } from "@/lib/auth-context";
+import { PromptProvider } from "@/components/ui/prompt-dialog";
 
 export const metadata: Metadata = {
   title: "Jing — Your Life, Organized",
@@ -29,11 +30,13 @@ export default async function RootLayout({
             defaultTheme="dark"
             disableTransitionOnChange
           >
-            <ErrorBoundary>
-              {children}
-              <CommandPalette />
-              <Toaster position="bottom-right" theme="system" />
-            </ErrorBoundary>
+            <PromptProvider>
+              <ErrorBoundary>
+                {children}
+                <CommandPalette />
+                <Toaster position="bottom-right" theme="system" />
+              </ErrorBoundary>
+            </PromptProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>

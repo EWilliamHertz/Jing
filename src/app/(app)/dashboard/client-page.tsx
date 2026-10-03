@@ -10,12 +10,13 @@ import { MoneyWidget } from "@/components/dashboard/money-widget"
 import { addTask } from "@/app/actions"
 import { toast } from "sonner"
 import { useTransition } from "react"
-import { useAuth } from "@/lib/auth-context"
+import { usePrompt } from "@/components/ui/prompt-dialog"
 
-export default function DashboardClientPage({ initialTasks }: { initialTasks: any[] }) {
+export default function DashboardClientPage({ initialTasks, initialHabits, initialGoals, initialMoney }: { initialTasks: any[], initialHabits: any[], initialGoals: any[], initialMoney: any[] }) {
   const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+  const { ask } = usePrompt()
   const [isPending, startTransition] = useTransition()
-  const isLoggedIn = useAuth()
+  const isLoggedIn = true;
   
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
@@ -31,10 +32,10 @@ export default function DashboardClientPage({ initialTasks }: { initialTasks: an
           <p className="text-muted-foreground mt-1">Here's what matters today.</p>
         </div>
         <div className="hidden sm:block">
-          <Button onClick={() => {
-            const title = prompt("Enter task title:")
+          <Button onClick={async () => {
+            const title = await ask("Enter task title:")
             if (title) {
-              const priority = prompt("Priority (High, Medium, Low):", "Medium")
+              const priority = await ask("Priority (High, Medium, Low):", "Medium")
               startTransition(() => {
                 addTask({ title, priority: priority || 'Medium', time: 'Anytime', project: 'Inbox', tab: 'today' })
               })
@@ -95,9 +96,9 @@ export default function DashboardClientPage({ initialTasks }: { initialTasks: an
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <HabitsWidget />
-          <GoalsWidget />
-          <MoneyWidget />
+          <HabitsWidget habits={initialHabits} />
+          <GoalsWidget goals={initialGoals} />
+          <MoneyWidget money={initialMoney} />
         </motion.div>
       </div>
     </div>

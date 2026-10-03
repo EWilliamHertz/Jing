@@ -7,9 +7,11 @@ import { addNote } from "@/app/actions"
 import { toast } from "sonner"
 import { useState, useTransition } from "react"
 
+import { usePrompt } from "@/components/ui/prompt-dialog"
 export default function NotesClientPage({ initialNotes }: { initialNotes: any[] }) {
   const notes = initialNotes
   const [query, setQuery] = useState("")
+  const { ask } = usePrompt()
   const [isPending, startTransition] = useTransition()
 
   const filteredNotes = notes.filter(n => n.title.toLowerCase().includes(query.toLowerCase()) || n.content.toLowerCase().includes(query.toLowerCase()))
@@ -21,10 +23,10 @@ export default function NotesClientPage({ initialNotes }: { initialNotes: any[] 
           <h1 className="text-3xl font-bold tracking-tight">Notes</h1>
           <p className="text-muted-foreground mt-1">Lightweight thoughts and documents.</p>
         </div>
-        <Button onClick={() => {
-          const title = prompt("Note title:")
+        <Button onClick={async () => {
+          const title = await ask("Note title:")
           if (title) {
-            const content = prompt("Content:")
+            const content = await ask("Content:")
             if (content) {
               startTransition(() => {
                 addNote(title, content)

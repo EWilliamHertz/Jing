@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { tasks, lists, listItems, notes } from '@/lib/schema'
+import { tasks, lists, listItems, notes, projects, goals, goalTasks, travel, money, reading, calendar, social, habits, ideas } from '@/lib/schema'
 import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
@@ -24,51 +24,33 @@ export async function isLoggedIn() {
 
 // --- TASKS ---
 export async function getTasks() {
-  if (!(await isLoggedIn())) {
-    return [
-      { id: '1', title: "Finish homepage design", priority: "High", time: "10:00 AM", project: "LifeStack Redesign", done: true, tab: "today", createdAt: new Date() },
-      { id: '2', title: "Review Q3 budget", priority: "Medium", time: "2:00 PM", project: "Finance", done: false, tab: "today", createdAt: new Date() },
-      { id: '3', title: "Call the dentist", priority: "Low", time: "Anytime", project: "Health", done: false, tab: "today", createdAt: new Date() },
-      { id: '4', title: "Buy groceries for dinner", priority: "Medium", time: "6:00 PM", project: "Personal", done: false, tab: "today", createdAt: new Date() },
-      { id: '5', title: "Renew domain name", priority: "High", time: "Next week", project: "Business", done: false, tab: "upcoming", createdAt: new Date() },
-    ];
-  }
-  return await db.select().from(tasks).orderBy(tasks.createdAt)
+    return await db.select().from(tasks).orderBy(tasks.createdAt)
 }
 
 export async function addTask(data: { title: string, priority: string, time: string, project: string, tab: string }) {
-  if (!(await isLoggedIn())) return;
-  await db.insert(tasks).values({
+    await db.insert(tasks).values({
     title: data.title,
     priority: data.priority,
     time: data.time,
     project: data.project,
     tab: data.tab
   })
-  revalidatePath('/')
+  revalidatePath('/', 'layout')
 }
 
 export async function toggleTask(id: string, currentStatus: boolean) {
-  if (!(await isLoggedIn())) return;
-  await db.update(tasks).set({ done: !currentStatus }).where(eq(tasks.id, id))
-  revalidatePath('/')
+    await db.update(tasks).set({ done: !currentStatus }).where(eq(tasks.id, id))
+  revalidatePath('/', 'layout')
 }
 
 export async function removeTask(id: string) {
-  if (!(await isLoggedIn())) return;
-  await db.delete(tasks).where(eq(tasks.id, id))
-  revalidatePath('/')
+    await db.delete(tasks).where(eq(tasks.id, id))
+  revalidatePath('/', 'layout')
 }
 
 // --- LISTS ---
 export async function getLists() {
-  if (!(await isLoggedIn())) {
-    return [
-      { id: 'l1', title: "Grocery", items: [{ id: 'i1', name: "Almond milk", done: false }, { id: 'i2', name: "Eggs", done: true }] },
-      { id: 'l2', title: "Packing (Stockholm)", items: [{ id: 'i3', name: "Passport", done: false }, { id: 'i4', name: "Camera", done: true }] }
-    ];
-  }
-  const allLists = await db.select().from(lists).orderBy(lists.createdAt)
+    const allLists = await db.select().from(lists).orderBy(lists.createdAt)
   const allItems = await db.select().from(listItems).orderBy(listItems.createdAt)
   
   return allLists.map(list => ({
@@ -78,36 +60,172 @@ export async function getLists() {
 }
 
 export async function addList(title: string) {
-  if (!(await isLoggedIn())) return;
-  await db.insert(lists).values({ title })
-  revalidatePath('/')
+    await db.insert(lists).values({ title })
+  revalidatePath('/', 'layout')
 }
 
 export async function addListItem(listId: string, name: string) {
-  if (!(await isLoggedIn())) return;
-  await db.insert(listItems).values({ listId, name })
-  revalidatePath('/')
+    await db.insert(listItems).values({ listId, name })
+  revalidatePath('/', 'layout')
 }
 
 export async function toggleListItem(id: string, currentStatus: boolean) {
-  if (!(await isLoggedIn())) return;
-  await db.update(listItems).set({ done: !currentStatus }).where(eq(listItems.id, id))
-  revalidatePath('/')
+    await db.update(listItems).set({ done: !currentStatus }).where(eq(listItems.id, id))
+  revalidatePath('/', 'layout')
 }
 
 // --- NOTES ---
 export async function getNotes() {
-  if (!(await isLoggedIn())) {
-    return [
-      { id: 'n1', title: "Meeting with Sarah", content: "Discussed the new design system.", date: "2 days ago" },
-      { id: 'n2', title: "Project Requirements", content: "Needs to be fast, responsive, and calm.", date: "1 week ago" }
-    ];
-  }
-  return await db.select().from(notes).orderBy(notes.createdAt)
+    return await db.select().from(notes).orderBy(notes.createdAt)
 }
 
 export async function addNote(title: string, content: string) {
-  if (!(await isLoggedIn())) return;
-  await db.insert(notes).values({ title, content })
-  revalidatePath('/')
+    await db.insert(notes).values({ title, content })
+  revalidatePath('/', 'layout')
+}
+
+
+// --- PROJECTS ---
+export async function getProjects() {
+    return await db.select().from(projects).orderBy(projects.createdAt)
+}
+
+export async function addProject(title: string, description?: string) {
+    await db.insert(projects).values({ title, description })
+  revalidatePath('/', 'layout')
+}
+
+// --- GOALS ---
+export async function getGoals() {
+    const allGoals = await db.select().from(goals).orderBy(goals.createdAt)
+    const allGoalTasks = await db.select().from(goalTasks).orderBy(goalTasks.createdAt)
+    
+    return allGoals.map(g => ({
+        ...g,
+        tasks: allGoalTasks.filter(gt => gt.goalId === g.id)
+    }))
+}
+
+export async function addGoal(title: string, progress?: string) {
+    await db.insert(goals).values({ title, progress })
+  revalidatePath('/', 'layout')
+}
+
+// --- TRAVEL ---
+export async function getTravels() {
+    return await db.select().from(travel).orderBy(travel.createdAt)
+}
+
+export async function addTravel(destination: string, date?: string) {
+    await db.insert(travel).values({ destination, date })
+  revalidatePath('/', 'layout')
+}
+
+// --- MONEY ---
+export async function getMoney() {
+    return await db.select().from(money).orderBy(money.createdAt)
+}
+
+export async function addMoney(amount: string, description: string, type?: string) {
+    await db.insert(money).values({ amount, description, type: type || 'expense' })
+  revalidatePath('/', 'layout')
+}
+
+// --- READING ---
+export async function getReadings() {
+    return await db.select().from(reading).orderBy(reading.createdAt)
+}
+
+export async function addReading(title: string, author?: string, status?: string) {
+    await db.insert(reading).values({ title, author, status: status || 'unread' })
+  revalidatePath('/', 'layout')
+}
+
+// --- CALENDAR ---
+export async function getCalendarEvents() {
+    return await db.select().from(calendar).orderBy(calendar.createdAt)
+}
+
+export async function addCalendarEvent(title: string, date: Date) {
+    await db.insert(calendar).values({ title, date })
+  revalidatePath('/', 'layout')
+}
+
+// --- SOCIAL ---
+export async function getSocials() {
+    return await db.select().from(social).orderBy(social.createdAt)
+}
+
+export async function addSocial(name: string, platform?: string) {
+    await db.insert(social).values({ name, platform })
+  revalidatePath('/', 'layout')
+}
+
+// --- HABITS ---
+export async function getHabits() {
+    return await db.select().from(habits).orderBy(habits.createdAt)
+}
+
+export async function addHabit(title: string, streak?: string) {
+    await db.insert(habits).values({ title, streak })
+  revalidatePath('/', 'layout')
+}
+
+// --- IDEAS ---
+export async function getIdeas() {
+    return await db.select().from(ideas).orderBy(ideas.createdAt)
+}
+
+export async function addIdea(content: string) {
+    await db.insert(ideas).values({ content })
+  revalidatePath('/', 'layout')
+}
+
+// --- GOAL TASKS ---
+export async function addGoalTask(goalId: string, title: string, progress?: string) {
+  await db.insert(goalTasks).values({ goalId, title, progress })
+  revalidatePath('/', 'layout')
+}
+
+export async function toggleGoalTask(id: string, currentStatus: boolean) {
+  await db.update(goalTasks).set({ done: !currentStatus }).where(eq(goalTasks.id, id))
+  revalidatePath('/', 'layout')
+}
+
+export async function updateGoalTaskProgress(id: string, progress: string) {
+  await db.update(goalTasks).set({ progress }).where(eq(goalTasks.id, id))
+  revalidatePath('/', 'layout')
+}
+
+export async function editGoal(id: string, title: string, progress: string) {
+    await db.update(goals).set({ title, progress }).where(eq(goals.id, id))
+    revalidatePath('/', 'layout')
+}
+
+export async function deleteGoal(id: string) {
+    await db.delete(goals).where(eq(goals.id, id))
+    revalidatePath('/', 'layout')
+}
+
+export async function doMigration() {
+    const allGoals = await db.select().from(goals);
+    for (const g of allGoals) {
+      if (g.title.includes("Hatake.Shop")) {
+        await db.insert(projects).values({ title: g.title, description: "Moved from goals" });
+        await db.delete(goals).where(eq(goals.id, g.id));
+      }
+    }
+    await db.insert(goals).values({ title: "loss weight, down to 85", progress: "0" });
+    revalidatePath('/', 'layout')
+    return "done";
+}
+
+export async function addMoneyTransaction(amount: string, description: string, type: string) {
+    await db.insert(money).values({ amount, description, type })
+    revalidatePath('/', 'layout')
+}
+
+export async function deleteMoneyTransaction(id: string) {
+    await db.delete(money).where(eq(money.id, id))
+    revalidatePath('/', 'layout')
 }

@@ -2,17 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle2 } from "lucide-react"
-import { useAuth } from "@/lib/auth-context"
 
-export function HabitsWidget() {
-  const isLoggedIn = useAuth()
+export function HabitsWidget({ habits = [] }: { habits?: any[] }) {
   
-  const habits = isLoggedIn ? [] : [
-    { name: "Morning walk", done: true },
-    { name: "Read 20 minutes", done: true },
-    { name: "Drink water", done: false },
-    { name: "Meditation", done: false }
-  ]
 
   return (
     <Card className="bg-card text-card-foreground">
@@ -25,7 +17,7 @@ export function HabitsWidget() {
         ) : (
           habits.map((habit, i) => (
             <div key={i} className="flex items-center justify-between group cursor-pointer">
-              <span className={`text-sm ${habit.done ? 'text-muted-foreground' : ''}`}>{habit.name}</span>
+              <span className={`text-sm ${habit.done ? 'text-muted-foreground' : ''}`}>{habit.title}</span>
               <button className="focus:outline-none">
                 {habit.done ? (
                   <CheckCircle2 className="h-5 w-5 text-primary" />

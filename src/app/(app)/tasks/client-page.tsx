@@ -8,12 +8,22 @@ import { CheckCircle2, Circle, Plus, Clock, Tag, Trash2 } from "lucide-react"
 import { addTask, toggleTask, removeTask } from "@/app/actions"
 import { toast } from "sonner"
 
+import { usePrompt } from "@/components/ui/prompt-dialog"
 export default function TasksClientPage({ initialTasks }: { initialTasks: any[] }) {
   const [activeTab, setActiveTab] = useState("today")
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set())
+  const { ask } = usePrompt()
   const [isPending, startTransition] = useTransition()
   const tasks = initialTasks
 
   const filteredTasks = tasks.filter(t => activeTab === "all" || t.tab === activeTab)
+
+  const toggleExpand = (id: string) => {
+    const next = new Set(expandedTasks)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    setExpandedTasks(next)
+  }
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8">
@@ -25,10 +35,10 @@ export default function TasksClientPage({ initialTasks }: { initialTasks: any[] 
         <Button 
           className="rounded-full shadow-sm"
           disabled={isPending}
-          onClick={() => {
-            const title = prompt("Enter task title:")
+          onClick={async () => {
+            const title = await ask("Enter task title:")
             if (title) {
-              const priority = prompt("Priority (High, Medium, Low):", "Medium")
+              const priority = await ask("Priority (High, Medium, Low):", "Medium")
               startTransition(() => {
                 addTask({
                   title,
@@ -80,8 +90,8 @@ export default function TasksClientPage({ initialTasks }: { initialTasks: any[] 
                       <Circle className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors" />
                     )}
                   </button>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-base font-medium truncate ${task.done ? 'line-through text-muted-foreground' : ''}`}>
+                  <div className="flex-1 min-w-0 cursor-pointer" onClick={() => toggleExpand(task.id)}>
+                    <p className={`text-base font-medium leading-relaxed ${expandedTasks.has(task.id) ? '' : 'truncate'} ${task.done ? 'line-through text-muted-foreground' : ''}`}>
                       {task.title}
                     </p>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">

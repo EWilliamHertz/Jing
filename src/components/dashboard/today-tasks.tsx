@@ -4,13 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, Circle, Clock } from "lucide-react"
 import { toggleTask } from "@/app/actions"
-import { useTransition } from "react"
+import { useTransition, useState } from "react"
 import Link from "next/link"
 
 export function TodayTasksWidget({ tasks = [] }: { tasks?: any[] }) {
   const [isPending, startTransition] = useTransition()
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set())
   const todayTasks = tasks.filter(t => t.tab === 'today')
   const remaining = todayTasks.filter(t => !t.done).length
+
+  const toggleExpand = (id: string) => {
+    const next = new Set(expandedTasks)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    setExpandedTasks(next)
+  }
 
   return (
     <Card className={`h-full bg-card text-card-foreground ${isPending ? 'opacity-70' : ''}`}>
@@ -33,8 +41,8 @@ export function TodayTasksWidget({ tasks = [] }: { tasks?: any[] }) {
                 <Circle className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
               )}
             </button>
-            <div className="flex-1 space-y-1 min-w-0">
-              <p className={`text-sm font-medium leading-none truncate ${item.done ? 'line-through text-muted-foreground' : ''}`}>
+            <div className="flex-1 space-y-1 min-w-0 cursor-pointer" onClick={() => toggleExpand(item.id)}>
+              <p className={`text-sm font-medium leading-relaxed ${expandedTasks.has(item.id) ? '' : 'truncate'} ${item.done ? 'line-through text-muted-foreground' : ''}`}>
                 {item.title}
               </p>
               <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
